@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<title>Tích vô hướng & Góc giữa hai vectơ (Lớp 12)</title>
+<meta name="tool-tags" content="hinh-hoc, vector, lop-12, tich-vo-huong">
+<meta name="keywords" content="vector, góc, dot product, cos">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style> body{font-family:system-ui;margin:20px} label{display:block;margin:6px 0} input{width:80px} button{padding:6px;margin-top:8px}</style>
+</head>
+<body>
+<h1>Góc giữa hai vectơ trong R²</h1>
+<h2>Công thức qua tích vô hướng</h2>
+<label>u = ( <input id="ux" type="number" step="any" value="1"> , <input id="uy" type="number" step="any" value="0"> )</label>
+<label>v = ( <input id="vx" type="number" step="any" value="0"> , <input id="vy" type="number" step="any" value="1"> )</label>
+<button onclick="calc()">Tính</button>
+<pre id="out"></pre>
+<script>
+function calc(){
+  const ux=+uxEl.value, uy=+uyEl.value, vx=+vxEl.value, vy=+vyEl.value;
+  const dot = ux*vx + uy*vy;
+  const nu = Math.hypot(ux,uy), nv = Math.hypot(vx,vy);
+  if(nu===0 || nv===0){ out.textContent='Vectơ không được bằng 0'; return; }
+  let cos = dot/(nu*nv);
+  cos = Math.max(-1, Math.min(1, cos));
+  const angle = Math.acos(cos)*180/Math.PI;
+  out.textContent = `u·v=${dot}\n|u|=${nu.toFixed(4)}, |v|=${nv.toFixed(4)}\n∠(u,v)≈${angle.toFixed(2)}°`;
+}
+const uxEl=document.getElementById('ux'), uyEl=document.getElementById('uy'), vxEl=document.getElementById('vx'), vyEl=document.getElementById('vy'), out=document.getElementById('out');
+</script>
+</body></html>

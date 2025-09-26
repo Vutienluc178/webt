@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<title>Giới hạn cơ bản (Lớp 11)</title>
+<meta name="tool-tags" content="giai-tich, gioi-han, lop-11">
+<meta name="keywords" content="limit, sin x / x, giới hạn x→0">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style> body{font-family:system-ui;margin:20px} input{padding:6px} button{padding:6px} pre{background:#f7f7f9;padding:10px;border-radius:8px}</style>
+</head>
+<body>
+<h1>Giới hạn khi x → 0</h1>
+<h2>Minh họa định nghĩa qua ví dụ sin(x)/x → 1</h2>
+<p>Nhập x gần 0 để xem f(x) = sin(x)/x tiến về 1.</p>
+<input id="x" type="number" step="0.001" value="0.1">
+<button onclick="calc()">Tính</button>
+<pre id="out"></pre>
+<script>
+function calc(){
+  const x = +document.getElementById('x').value;
+  const fx = (Math.abs(x) < 1e-12) ? 1 : Math.sin(x)/x;
+  document.getElementById('out').textContent = `x=${x}\nf(x)=sin(x)/x≈${fx}`;
+}
+</script>
+</body></html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Math Tools Hub — Ultra (Lớp 10–11–12)</title>
+  <meta name="description" content="Tìm công cụ Toán học THPT siêu nhanh: phím tắt, autosuggest, palette ⌘K/Ctrl+K, ⭐ yêu thích, gần đây.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="shell">
+    <nav class="topbar">
+      <a class="brand" href="./" aria-label="Trang chủ">
+        <img src="assets/logo.svg" alt="" width="28" height="28"/>
+        <span>Math Tools Hub — Ultra</span>
+      </a>
+      <div class="top-actions">
+        <button id="themeToggle" class="btn ghost" title="Đổi giao diện (Sáng/Tối)">🌓</button>
+        <button id="openPalette" class="btn" title="Mở Command Palette (⌘K/Ctrl+K)">⌘K</button>
+        <a class="btn primary" href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </nav>
+    <div class="hero">
+      <h1>🧮 Công cụ Toán học THPT</h1>
+      <p>Chỉ cần thả file <code>.html</code> vào <code>tools/10</code>, <code>tools/11</code> hoặc <code>tools/12</code>. Trang chủ tự cập nhật qua manifest.</p>
+      <div class="hints">
+        <span>Phím tắt: <kbd>/</kbd> tìm kiếm • <kbd>Esc</kbd> xóa bộ lọc • <kbd>⌘K/Ctrl+K</kbd> mở Palette</span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="input-group">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6zM10 14.5A4.5 4.5 0 1114.5 10 4.505 4.505 0 0110 14.5z"></path></svg>
+        <input id="q" type="search" placeholder="Tìm theo tên, tag, chủ đề…" autocomplete="off"/>
+      </div>
+      <div class="filters">
+        <div class="tabs" role="tablist" aria-label="Chọn khối">
+          <button class="tab is-active" data-grade="">Tất cả</button>
+          <button class="tab" data-grade="10">Lớp 10</button>
+          <button class="tab" data-grade="11">Lớp 11</button>
+          <button class="tab" data-grade="12">Lớp 12</button>
+        </div>
+        <select id="sort">
+          <option value="title">Sắp xếp: A→Z</option>
+          <option value="-title">Sắp xếp: Z→A</option>
+          <option value="-updatedAt">Mới cập nhật</option>
+          <option value="updatedAt">Cũ trước</option>
+        </select>
+        <label class="switch"><input type="checkbox" id="onlyFavs"><span>Chỉ ⭐</span></label>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="stats" class="stats"></section>
+    <section id="chipbar" class="chipbar"></section>
+    <section id="recents" class="recents"></section>
+    <section id="list" class="grid"></section>
+  </main>
+
+  <footer class="shell footer">
+    <div class="cols">
+      <div>
+        <h4>Về dự án</h4>
+        <p>Static site chạy trên GitHub Pages. Manifest tự sinh bằng GitHub Actions.</p>
+      </div>
+      <div>
+        <h4>Hướng dẫn</h4>
+        <ol>
+          <li>Thêm file .html vào thư mục tools/10|11|12</li>
+          <li>Commit & push lên nhánh <code>main</code></li>
+          <li>Actions sẽ tạo <code>manifest.json</code> và xuất hiện ngay trên trang</li>
+        </ol>
+      </div>
+    </div>
+    <small>© 2025 Math Tools Hub • Ultra Edition</small>
+  </footer>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>

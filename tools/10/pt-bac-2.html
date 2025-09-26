@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<title>Máy tính phương trình bậc hai (Lớp 10)</title>
+<meta name="tool-tags" content="dai-so, bac-2, nghiem, delta">
+<meta name="keywords" content="quadratic, delta, nghiệm, phương trình bậc hai">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style> body { font-family: system-ui; margin: 20px; } label,input,button{ font-size: 16px; margin:4px;} </style>
+</head>
+<body>
+<h1>Phương trình bậc hai</h1>
+<h2>Dạng tổng quát ax² + bx + c = 0</h2>
+<p>Nhập a, b, c và xem nghiệm.</p>
+<label>a <input id="a" type="number" step="any" value="1"></label>
+<label>b <input id="b" type="number" step="any" value="0"></label>
+<label>c <input id="c" type="number" step="any" value="0"></label>
+<button onclick="solve()">Giải</button>
+<pre id="out"></pre>
+<script>
+const aEl=document.getElementById('a'), bEl=document.getElementById('b'), cEl=document.getElementById('c'), out=document.getElementById('out');
+function solve(){
+  const a=+aEl.value,b=+bEl.value,c=+cEl.value;
+  let msg='';
+  if(a===0){ msg+='a=0 → không phải PT bậc 2'; out.textContent=msg; return; }
+  const d=b*b-4*a*c; msg+=`Δ = ${d}\n`;
+  if(d<0) msg+='Vô nghiệm thực';
+  else if(d===0) msg+=`Nghiệm kép x = ${(-b)/(2*a)}`;
+  else msg+=`x1=${(-b+Math.sqrt(d))/(2*a)}, x2=${(-b-Math.sqrt(d))/(2*a)}`;
+  out.textContent=msg;
+}
+</script>
+</body></html>

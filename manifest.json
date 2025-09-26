@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Máy tính phương trình bậc hai (Lớp 10)",
+    "path": "tools/10/pt-bac-2.html",
+    "grade": "10",
+    "tags": [
+      "dai-so",
+      "bac-2",
+      "nghiem",
+      "delta"
+    ],
+    "updatedAt": "2025-09-26T15:58:23",
+    "extra": {
+      "headings": [
+        "Phương trình bậc hai",
+        "Dạng tổng quát ax² + bx + c = 0"
+      ],
+      "keywords": [
+        "quadratic",
+        "delta",
+        "nghiệm",
+        "phương trình bậc hai"
+      ]
+    }
+  },
+  {
+    "title": "Giới hạn cơ bản (Lớp 11)",
+    "path": "tools/11/gioi-han-co-ban.html",
+    "grade": "11",
+    "tags": [
+      "giai-tich",
+      "gioi-han",
+      "lop-11"
+    ],
+    "updatedAt": "2025-09-26T15:58:23",
+    "extra": {
+      "headings": [
+        "Giới hạn khi x → 0",
+        "Minh họa định nghĩa qua ví dụ sin(x)/x → 1"
+      ],
+      "keywords": [
+        "limit",
+        "sin x / x",
+        "giới hạn x→0"
+      ]
+    }
+  },
+  {
+    "title": "Tích vô hướng & Góc giữa hai vectơ (Lớp 12)",
+    "path": "tools/12/goc-giua-hai-vector.html",
+    "grade": "12",
+    "tags": [
+      "hinh-hoc",
+      "vector",
+      "lop-12",
+      "tich-vo-huong"
+    ],
+    "updatedAt": "2025-09-26T15:58:23",
+    "extra": {
+      "headings": [
+        "Góc giữa hai vectơ trong R²",
+        "Công thức qua tích vô hướng"
+      ],
+      "keywords": [
+        "vector",
+        "góc",
+        "dot product",
+        "cos"
+      ]
+    }
+  }
+]
