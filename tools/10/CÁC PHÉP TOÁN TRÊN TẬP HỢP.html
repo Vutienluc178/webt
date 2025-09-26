@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minh Họa Các Phép Toán Trên Tập Hợp Số Thực</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .control-panel {
+            background-color: #1f2937;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        canvas {
+            background-color: #0c121e;
+            border-radius: 0.75rem;
+            display: block;
+            width: 100%;
+            height: 100%; /* Sửa để canvas lấp đầy container */
+        }
+        #canvas-container {
+            background-color: #0c121e; /* Đảm bảo nền khi toàn màn hình */
+            border-radius: 0.75rem;
+        }
+        .input-group input {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: white;
+            border-radius: 0.375rem;
+            text-align: center;
+            width: 5rem;
+        }
+        .bracket-btn {
+            background-color: #4b5563;
+            border: 2px solid transparent;
+            font-weight: bold;
+            font-size: 1.25rem;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        .bracket-btn:hover {
+            background-color: #6b7280;
+        }
+        .bracket-btn.active {
+            background-color: #3b82f6;
+            border-color: #60a5fa;
+            color: white;
+        }
+        .op-btn {
+            background-color: #374151;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .op-btn:hover {
+            background-color: #4b5563;
+        }
+        .op-btn.active {
+            background-color: #3b82f6;
+            border-color: #60a5fa;
+            color: white;
+            font-weight: bold;
+        }
+        .inf-btn {
+            background-color: #4b5563;
+            color: #f3f4f6;
+            font-weight: bold;
+            font-size: 1.25rem;
+            width: 3.5rem;
+            height: 3rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+        .inf-btn:hover {
+            background-color: #6b7280;
+        }
+        #result-display {
+            background-color: #111827;
+            border: 1px solid #374151;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #f59e0b; /* Amber color */
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <header class="text-center mb-6">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Minh Họa Các Phép Toán Trên Tập Hợp Số Thực</h1>
+        <p class="text-lg text-gray-400 mt-2">Vũ Tiến Lực - Trường THPT Nguyễn Hữu Cảnh</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Cột Trái: Canvas -->
+        <div id="canvas-container" class="relative w-full h-full min-h-[300px] sm:min-h-[400px] md:min-h-[500px]">
+            <canvas id="numberLineCanvas"></canvas>
+            <button id="fullscreen-btn" class="absolute top-3 right-3 p-2 rounded-full bg-gray-700/50 hover:bg-gray-600/70 transition-colors z-10" title="Chế độ toàn màn hình">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Cột Phải: Bảng điều khiển -->
+        <div class="control-panel space-y-8">
+            <!-- Nhập liệu cho tập A -->
+            <div class="set-input" data-set="a">
+                <h3 class="text-xl font-bold mb-3 text-red-400">Tập A</h3>
+                <div class="input-group flex items-center justify-center space-x-2">
+                    <button class="inf-btn" data-target="start_a" data-value="-Infinity">-∞</button>
+                    <div class="brackets-start space-x-1">
+                        <button class="bracket-btn active" data-value="[">[</button>
+                        <button class="bracket-btn" data-value="(">(</button>
+                    </div>
+                    <input type="text" id="start_a" value="-5" class="p-2">
+                    <span class="text-gray-400">,</span>
+                    <input type="text" id="end_a" value="3" class="p-2">
+                    <div class="brackets-end space-x-1">
+                        <button class="bracket-btn active" data-value="]">]</button>
+                        <button class="bracket-btn" data-value=")">)</button>
+                    </div>
+                    <button class="inf-btn" data-target="end_a" data-value="Infinity">+∞</button>
+                </div>
+            </div>
+
+            <!-- Nhập liệu cho tập B -->
+            <div class="set-input" data-set="b">
+                <h3 class="text-xl font-bold mb-3 text-blue-400">Tập B</h3>
+                <div class="input-group flex items-center justify-center space-x-2">
+                    <button class="inf-btn" data-target="start_b" data-value="-Infinity">-∞</button>
+                    <div class="brackets-start space-x-1">
+                        <button class="bracket-btn" data-value="[">[</button>
+                        <button class="bracket-btn active" data-value="(">(</button>
+                    </div>
+                    <input type="text" id="start_b" value="1" class="p-2">
+                    <span class="text-gray-400">,</span>
+                    <input type="text" id="end_b" value="8" class="p-2">
+                    <div class="brackets-end space-x-1">
+                        <button class="bracket-btn" data-value="]">]</button>
+                        <button class="bracket-btn active" data-value=")">)</button>
+                    </div>
+                    <button class="inf-btn" data-target="end_b" data-value="Infinity">+∞</button>
+                </div>
+            </div>
+
+            <!-- Chọn Phép Toán -->
+            <div>
+                <h3 class="text-xl font-bold mb-3 text-center">Phép Toán</h3>
+                <div id="operation-buttons" class="grid grid-cols-3 gap-3">
+                    <button class="op-btn p-3 rounded-md active" data-op="union">A ∪ B</button>
+                    <button class="op-btn p-3 rounded-md" data-op="intersection">A ∩ B</button>
+                    <button class="op-btn p-3 rounded-md" data-op="diff_a_b">A \ B</button>
+                </div>
+            </div>
+            
+            <!-- Hiển thị kết quả -->
+             <div>
+                <h3 class="text-xl font-bold mb-3 text-center">Kết Quả</h3>
+                <div id="result-display" class="p-4 rounded-md text-center">
+                    ...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Khởi tạo ---
+        const canvas = document.getElementById('numberLineCanvas');
+        const ctx = canvas.getContext('2d');
+        const resultDisplay = document.getElementById('result-display');
+        let currentOperation = 'union';
+
+        const state = {
+            a: { start: -5, end: 3, startInclusive: true, endInclusive: true },
+            b: { start: 1, end: 8, startInclusive: false, endInclusive: false }
+        };
+
+        const COLORS = {
+            axis: '#9ca3af',
+            text: '#f3f4f6',
+            setA: '#f87171', // red-400
+            setB: '#60a5fa', // blue-400
+            result: '#f59e0b', // amber-500
+        };
+        
+        const LINE_WIDTH = 5;
+        const FONT_SIZE = 24;
+
+        function setupCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const parent = canvas.parentElement;
+            const rect = parent.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            draw();
+        }
+
+        function parseValue(str) {
+            const s = String(str).toLowerCase().trim();
+            if (s === 'inf' || s === '+inf' || s === 'infinity' || s === '+infinity' || s === '∞' || s === '+∞') {
+                return Infinity;
+            }
+            if (s === '-inf' || s === '-infinity' || s === '-∞') {
+                return -Infinity;
+            }
+            const num = parseFloat(s);
+            return isNaN(num) ? 0 : num; // Default to 0 if invalid
+        }
+
+        // --- Logic tính toán ---
+        function calculateResult() {
+            let { a, b } = state;
+            if (a.start > a.end) [a.start, a.end] = [a.end, a.start];
+            if (b.start > b.end) [b.start, b.end] = [b.end, b.start];
+
+            switch(currentOperation) {
+                case 'union':
+                    // Kiểm tra nếu 2 tập hợp không giao nhau và không kề nhau
+                    const touchOrOverlap = Math.max(a.start, b.start) <= Math.min(a.end, b.end) || 
+                                          (a.end === b.start && (a.endInclusive || b.startInclusive)) ||
+                                          (b.end === a.start && (b.endInclusive || a.startInclusive));
+
+                    if (!touchOrOverlap) {
+                         return [a, b].sort((x, y) => x.start - y.start);
+                    }
+                    const start = Math.min(a.start, b.start);
+                    const end = Math.max(a.end, b.end);
+                    const startInclusive = (a.start < b.start) ? a.startInclusive : (b.start < a.start) ? b.startInclusive : (a.startInclusive || b.startInclusive);
+                    const endInclusive = (a.end > b.end) ? a.endInclusive : (b.end > a.end) ? b.endInclusive : (a.endInclusive || b.endInclusive);
+                    return [{ start, end, startInclusive, endInclusive }];
+
+                case 'intersection':
+                    const iStart = Math.max(a.start, b.start);
+                    const iEnd = Math.min(a.end, b.end);
+                    if (iStart > iEnd || (iStart === iEnd && !( (a.start === iStart ? a.startInclusive : (b.start === iStart ? b.startInclusive: false)) && (a.end === iEnd ? a.endInclusive : (b.end === iEnd ? b.endInclusive: false)) ))) {
+                        return []; // Tập rỗng
+                    }
+                    const iStartInclusive = (a.start === iStart ? a.startInclusive : b.startInclusive) && (b.start === iStart ? b.startInclusive : a.startInclusive);
+                    const iEndInclusive = (a.end === iEnd ? a.endInclusive : b.endInclusive) && (b.end === iEnd ? b.endInclusive : a.endInclusive);
+                    return [{ start: iStart, end: iEnd, startInclusive: iStartInclusive, endInclusive: iEndInclusive }];
+
+                case 'diff_a_b':
+                     if (a.end < b.start || a.start > b.end || (a.end === b.start && !a.endInclusive && !b.startInclusive) || (a.start === b.end && !a.startInclusive && !b.endInclusive) ) return [a];
+                     let results = [];
+                     if (a.start < b.start) {
+                         results.push({ start: a.start, end: b.start, startInclusive: a.startInclusive, endInclusive: !b.startInclusive });
+                     }
+                     if (a.end > b.end) {
+                         results.push({ start: b.end, end: a.end, startInclusive: !b.endInclusive, endInclusive: a.endInclusive });
+                     }
+                     return results.filter(r => r.start < r.end || (r.start === r.end && r.startInclusive && r.endInclusive));
+            }
+            return [];
+        }
+
+        // --- Logic vẽ ---
+        function draw() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const finiteValues = [state.a.start, state.a.end, state.b.start, state.b.end].filter(isFinite);
+            let visualMin, visualMax;
+
+            if (finiteValues.length > 0) {
+                visualMin = Math.min(...finiteValues);
+                visualMax = Math.max(...finiteValues);
+            } else {
+                visualMin = -10;
+                visualMax = 10;
+            }
+            const padding = (visualMax - visualMin) * 0.2 || 2;
+            visualMin -= padding;
+            visualMax += padding;
+
+            const range = visualMax - visualMin;
+            const scale = (width - 80) / range;
+            const toX = (val) => 40 + (val - visualMin) * scale;
+
+            const yAxis = height / 2;
+            const yA = yAxis - 80;
+            const yB = yAxis - 40;
+            const yResult = yAxis; // SỬA: Biểu diễn kết quả ngay trên trục số
+
+            const endpoints = [...new Set([state.a.start, state.a.end, state.b.start, state.b.end].filter(isFinite))];
+            
+            drawAxis(toX, yAxis, visualMin, visualMax, width, endpoints);
+            
+            drawInterval(state.a, yA, COLORS.setA, toX, 'A', yAxis, visualMin, visualMax);
+            drawInterval(state.b, yB, COLORS.setB, toX, 'B', yAxis, visualMin, visualMax);
+
+            const resultSets = calculateResult();
+            resultSets.forEach(set => drawInterval(set, yResult, COLORS.result, toX, null, null, visualMin, visualMax));
+
+            updateResultText(resultSets);
+        }
+
+        function drawArrow(x, y, direction, color) {
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = LINE_WIDTH;
+            const size = 10;
+            ctx.beginPath();
+            if (direction === 'right') {
+                ctx.moveTo(x - size, y - size);
+                ctx.lineTo(x, y);
+                ctx.lineTo(x - size, y + size);
+            } else {
+                ctx.moveTo(x + size, y - size);
+                ctx.lineTo(x, y);
+                ctx.lineTo(x + size, y + size);
+            }
+            ctx.stroke();
+        }
+
+        function drawAxis(toX, y, min, max, width, endpoints) {
+            ctx.strokeStyle = COLORS.axis;
+            ctx.fillStyle = COLORS.text;
+            ctx.lineWidth = 3;
+            ctx.font = `bold ${FONT_SIZE * 0.7}px 'Inter'`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            ctx.beginPath();
+            ctx.moveTo(toX(min), y);
+            ctx.lineTo(toX(max), y);
+            ctx.stroke();
+
+            drawArrow(toX(min) + 5, y, 'left', COLORS.axis);
+            drawArrow(toX(max) - 5, y, 'right', COLORS.axis);
+
+            endpoints.forEach(point => {
+                ctx.beginPath();
+                ctx.moveTo(toX(point), y - 10);
+                ctx.lineTo(toX(point), y + 10);
+                ctx.stroke();
+                ctx.fillText(point, toX(point), y + 30);
+            });
+        }
+
+        function drawProjectionLine(x, y1, y2, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(x, y1);
+            ctx.lineTo(x, y2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawInterval(interval, y, color, toX, setName, yAxis, visualMin, visualMax) {
+            if (!interval) return;
+            const isStartInf = interval.start === -Infinity;
+            const isEndInf = interval.end === Infinity;
+
+            const x1 = toX(isStartInf ? visualMin : interval.start);
+            const x2 = toX(isEndInf ? visualMax : interval.end);
+
+            if (yAxis && (setName === 'A' || setName === 'B')) {
+                if (!isStartInf) drawProjectionLine(toX(interval.start), y, yAxis, color);
+                if (!isEndInf) drawProjectionLine(toX(interval.end), y, yAxis, color);
+            }
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = LINE_WIDTH;
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x2, y);
+            ctx.stroke();
+            
+            if (isStartInf) drawArrow(x1 + 5, y, 'left', color);
+            if (isEndInf) drawArrow(x2 - 5, y, 'right', color);
+            
+            if (!isStartInf) drawEndpoint(toX(interval.start), y, color, interval.startInclusive);
+            if (!isEndInf) drawEndpoint(toX(interval.end), y, color, interval.endInclusive);
+            
+            if (setName) {
+                const startText = isStartInf ? '-∞' : interval.start;
+                const endText = isEndInf ? '∞' : interval.end;
+                const text = `${setName}: ${interval.startInclusive ? '[' : '('}${startText}; ${endText}${interval.endInclusive ? ']' : ')'}`;
+                ctx.fillStyle = color;
+                ctx.font = `bold ${FONT_SIZE * 0.8}px 'Inter'`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(text, (x1 + x2) / 2, y - 15);
+            }
+        }
+        
+        function drawEndpoint(x, y, color, isInclusive) {
+            ctx.beginPath();
+            ctx.arc(x, y, LINE_WIDTH + 2, 0, 2 * Math.PI);
+            ctx.fillStyle = isInclusive ? color : '#0c121e';
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        function updateResultText(resultSets) {
+            if (resultSets.length === 0) {
+                resultDisplay.textContent = '∅';
+                return;
+            }
+            const text = resultSets.map(s => {
+                const startText = s.start === -Infinity ? '-∞' : s.start;
+                const endText = s.end === Infinity ? '∞' : s.end;
+                return `${s.startInclusive ? '[' : '('}${startText}; ${endText}${s.endInclusive ? ']' : ')'}`
+            }).join(' ∪ ');
+            resultDisplay.textContent = text;
+        }
+
+        function updateBracketsForInfinity(setName) {
+            const set = state[setName];
+            const group = document.querySelector(`.set-input[data-set="${setName}"]`);
+            if (set.start === -Infinity) {
+                set.startInclusive = false;
+                group.querySelector('.brackets-start .bracket-btn[data-value="["]').classList.remove('active');
+                group.querySelector('.brackets-start .bracket-btn[data-value="("]').classList.add('active');
+            }
+            if (set.end === Infinity) {
+                set.endInclusive = false;
+                group.querySelector('.brackets-end .bracket-btn[data-value="]"]').classList.remove('active');
+                group.querySelector('.brackets-end .bracket-btn[data-value=")"]').classList.add('active');
+            }
+        }
+
+        function handleInputChange() {
+            state.a.start = parseValue(document.getElementById('start_a').value);
+            state.a.end = parseValue(document.getElementById('end_a').value);
+            state.b.start = parseValue(document.getElementById('start_b').value);
+            state.b.end = parseValue(document.getElementById('end_b').value);
+            updateBracketsForInfinity('a');
+            updateBracketsForInfinity('b');
+            draw();
+        }
+
+        // --- Gắn sự kiện ---
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('input', handleInputChange);
+        });
+
+        document.querySelectorAll('.inf-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetInputId = e.currentTarget.dataset.target;
+                const value = e.currentTarget.dataset.value;
+                const input = document.getElementById(targetInputId);
+                input.value = (value === 'Infinity') ? '∞' : '-∞';
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+
+        document.querySelectorAll('.set-input').forEach(group => {
+            const setName = group.dataset.set;
+            group.addEventListener('click', (e) => {
+                if (!e.target.closest('.bracket-btn')) return;
+                const btn = e.target.closest('.bracket-btn');
+                const parent = btn.parentElement;
+                
+                if (parent.classList.contains('brackets-start') && state[setName].start === -Infinity && btn.dataset.value === '[') return;
+                if (parent.classList.contains('brackets-end') && state[setName].end === Infinity && btn.dataset.value === ']') return;
+
+                parent.querySelectorAll('.bracket-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                if (parent.classList.contains('brackets-start')) {
+                    state[setName].startInclusive = (btn.dataset.value === '[');
+                } else if (parent.classList.contains('brackets-end')) {
+                    state[setName].endInclusive = (btn.dataset.value === ']');
+                }
+                draw();
+            });
+        });
+
+        document.getElementById('operation-buttons').addEventListener('click', e => {
+            if (!e.target.closest('.op-btn')) return;
+            const btn = e.target.closest('.op-btn');
+            currentOperation = btn.dataset.op;
+            document.querySelectorAll('.op-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            draw();
+        });
+
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvasContainer = document.getElementById('canvas-container');
+
+        fullscreenBtn.addEventListener('click', () => {
+            try {
+                if (!document.fullscreenElement) {
+                    let requestPromise;
+                    if (canvasContainer.requestFullscreen) {
+                        requestPromise = canvasContainer.requestFullscreen();
+                    } else if (canvasContainer.webkitRequestFullscreen) { /* Safari */
+                        requestPromise = canvasContainer.webkitRequestFullscreen();
+                    } else if (canvasContainer.msRequestFullscreen) { /* IE11 */
+                        requestPromise = canvasContainer.msRequestFullscreen();
+                    }
+
+                    if (requestPromise) {
+                        requestPromise.catch(err => {
+                            // Log a friendly message instead of a scary error
+                            console.log(`Không thể vào chế độ toàn màn hình: ${err.name} - ${err.message}`);
+                        });
+                    }
+
+                } else {
+                    let exitPromise;
+                    if (document.exitFullscreen) {
+                       exitPromise = document.exitFullscreen();
+                    }
+                    
+                    if (exitPromise) {
+                        exitPromise.catch(err => {
+                            console.log(`Lỗi khi thoát chế độ toàn màn hình: ${err.name} - ${err.message}`);
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Lỗi đồng bộ khi xử lý chế độ toàn màn hình:", err);
+            }
+        });
+
+        window.addEventListener('resize', setupCanvas);
+        
+        document.addEventListener('fullscreenchange', () => {
+            // Cần một khoảng trễ nhỏ để trình duyệt cập nhật kích thước container
+            setTimeout(setupCanvas, 50);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            handleInputChange();
+            setupCanvas();
+        });
+    </script>
+</body>
+</html>
+

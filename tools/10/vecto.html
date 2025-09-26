@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Về Véc-tơ: Định Nghĩa và Phép Toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* Off-white background */
+            color: #1f2937; /* Dark gray text */
+        }
+        .control-panel {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        canvas {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: default;
+        }
+        .step-label {
+            display: block;
+            background-color: #e5e7eb;
+            color: #374151;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 2px solid transparent;
+        }
+        .step-label:hover {
+            background-color: #d1d5db;
+        }
+        input[type="radio"]:checked + .step-label {
+            background-color: #3b82f6;
+            border-color: #60a5fa;
+            color: white;
+            font-weight: 600;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        .reset-btn {
+            background-color: #e11d48;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .reset-btn:hover {
+            background-color: #be123c;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #d1d5db;
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #16a34a;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <header class="text-center mb-6">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">Học Về Véc-tơ: Định Nghĩa và Phép Toán</h1>
+        <p class="text-lg text-gray-500 mt-2">Vũ Tiến Lực - Trường THPT Nguyễn Hữu Cảnh</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cột Trái: Canvas -->
+        <div id="canvas-container" class="lg:col-span-2 relative w-full h-full min-h-[400px] md:min-h-[600px]">
+            <canvas id="vectorCanvas"></canvas>
+            <button id="fullscreen-btn" class="absolute top-3 right-3 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors z-10" title="Chế độ toàn màn hình">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Cột Phải: Bảng điều khiển -->
+        <div class="control-panel flex flex-col justify-between">
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-center">Các bước học</h3>
+                <div id="steps-control" class="space-y-3">
+                    <div>
+                        <input type="radio" id="step1" name="learn-step" value="1" checked>
+                        <label for="step1" class="step-label">1. Véc-tơ là gì?</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="step2" name="learn-step" value="2">
+                        <label for="step2" class="step-label">2. Tích một số với véc-tơ</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="step3" name="learn-step" value="3">
+                        <label for="step3" class="step-label">3. Hai véc-tơ</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="step4" name="learn-step" value="4">
+                        <label for="step4" class="step-label">4. Tổng hai véc-tơ (Quy tắc 3 điểm)</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="step5" name="learn-step" value="5">
+                        <label for="step5" class="step-label">5. Quy tắc Hình bình hành</label>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scalar-control" class="hidden space-y-3 pt-6">
+                <div class="flex justify-between items-center">
+                    <label for="scalar-k" class="font-medium text-lg">Hệ số k:</label>
+                    <span id="k-value-display" class="font-bold text-xl text-green-600">1.0</span>
+                </div>
+                <input type="range" id="scalar-k" min="-2" max="3" step="0.1" value="1" class="w-full">
+            </div>
+
+            <div>
+                <p class="text-center text-gray-500 pt-6">Kéo điểm ngọn để thay đổi véc-tơ. Kéo thân véc-tơ để di chuyển.</p>
+                <div class="pt-4">
+                    <button id="reset-btn" class="w-full reset-btn">Thiết Lập Lại</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('vectorCanvas');
+        const ctx = canvas.getContext('2d');
+        const stepsControl = document.getElementById('steps-control');
+        const resetBtn = document.getElementById('reset-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvasContainer = document.getElementById('canvas-container');
+        const scalarControl = document.getElementById('scalar-control');
+        const scalarSlider = document.getElementById('scalar-k');
+        const kValueDisplay = document.getElementById('k-value-display');
+
+        const COLORS = {
+            point: '#4b5563',
+            text: '#1f2937',
+            vecA: '#ef4444',
+            vecB: '#3b82f6',
+            vecSum: '#f59e0b',
+            vecScaled: '#16a34a',
+        };
+        const FONT_SIZE = 22;
+
+        let origin = { x: 0, y: 0 };
+        let scale = 40;
+        let displayStep = 1;
+        
+        function getInitialState() {
+             return {
+                a: { start: { x: -5, y: -1 }, vec: { x: 4, y: 2 } },
+                b: { start: { x: 1, y: -2 }, vec: { x: 1, y: 3 } },
+                k: 1.5,
+                dragTarget: null,
+            };
+        }
+        let state = getInitialState();
+
+        const toCanvasX = (x) => origin.x + x * scale;
+        const toCanvasY = (y) => origin.y - y * scale;
+        const fromCanvasX = (cx) => (cx - origin.x) / scale;
+        const fromCanvasY = (cy) => (origin.y - cy) / scale;
+
+        function setupCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            origin.x = canvas.clientWidth / 2;
+            origin.y = canvas.clientHeight / 2;
+            draw();
+        }
+        
+        function drawPoint(p, name, isDimmed = false) {
+            const px = toCanvasX(p.x);
+            const py = toCanvasY(p.y);
+            ctx.save();
+            if(isDimmed) ctx.globalAlpha = 0.5;
+            ctx.fillStyle = COLORS.point;
+            ctx.beginPath();
+            ctx.arc(px, py, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = COLORS.text;
+            ctx.font = `bold ${FONT_SIZE * 0.9}px 'Inter'`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(name, px + 10, py + 10);
+            ctx.restore();
+        }
+
+        function drawVector(vec, color, start, isDashed = false) {
+            const head = { x: start.x + vec.x, y: start.y + vec.y };
+            const headX = toCanvasX(head.x);
+            const headY = toCanvasY(head.y);
+            const startX = toCanvasX(start.x);
+            const startY = toCanvasY(start.y);
+            const length = Math.sqrt((headX-startX)**2 + (headY-startY)**2);
+            if(length < 1) return;
+
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 5;
+            if (isDashed) { ctx.setLineDash([8, 8]); ctx.globalAlpha = 0.6; }
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(headX, headY);
+            ctx.stroke();
+            const angle = Math.atan2(headY - startY, headX - startX);
+            const size = 15;
+            ctx.beginPath();
+            ctx.moveTo(headX, headY);
+            ctx.lineTo(headX - size * Math.cos(angle - Math.PI / 6), headY - size * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(headX - size * Math.cos(angle + Math.PI / 6), headY - size * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawHandle(vec, color, start) {
+            const head = { x: start.x + vec.x, y: start.y + vec.y };
+            const x = toCanvasX(head.x);
+            const y = toCanvasY(head.y);
+            ctx.fillStyle = color;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fill();
+        }
+
+        function drawVectorLabel(vec, name, color, start) {
+            const mid = { x: start.x + vec.x / 2, y: start.y + vec.y / 2 };
+            const length = Math.sqrt(vec.x ** 2 + vec.y ** 2);
+            if (length < 0.5) return;
+            const offset = { x: -vec.y / length * 0.7, y: vec.x / length * 0.7 };
+            const textPos = { x: toCanvasX(mid.x + offset.x), y: toCanvasY(mid.y + offset.y) };
+            ctx.fillStyle = color;
+            ctx.font = `italic bold ${FONT_SIZE}px 'Inter'`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(name, textPos.x, textPos.y);
+            const metrics = ctx.measureText(name);
+            const arrowY = textPos.y - FONT_SIZE * 0.7;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(textPos.x - metrics.width / 2, arrowY);
+            ctx.lineTo(textPos.x + metrics.width / 2, arrowY);
+            ctx.lineTo(textPos.x + metrics.width / 2 - 8, arrowY - 4);
+            ctx.moveTo(textPos.x + metrics.width / 2, arrowY);
+            ctx.lineTo(textPos.x + metrics.width / 2 - 8, arrowY + 4);
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+            const { a, b, k } = state;
+
+            if (displayStep === 1) {
+                drawPoint(a.start, 'A');
+                const a_end = { x: a.start.x + a.vec.x, y: a.start.y + a.vec.y };
+                drawPoint(a_end, 'B');
+                drawVector(a.vec, COLORS.vecA, a.start);
+                drawVectorLabel(a.vec, 'AB', COLORS.text, a.start);
+                drawHandle(a.vec, COLORS.vecA, a.start);
+            }
+            if (displayStep === 2) {
+                const scaled_vec = { x: a.vec.x * k, y: a.vec.y * k };
+                const a_end = { x: a.start.x + a.vec.x, y: a.start.y + a.vec.y };
+                const c_pos = { x: a.start.x + scaled_vec.x, y: a.start.y + scaled_vec.y };
+
+                drawPoint(a.start, 'A');
+                drawPoint(a_end, 'B', true);
+                drawVector(a.vec, COLORS.vecA, a.start, true);
+                
+                drawVector(scaled_vec, COLORS.vecScaled, a.start);
+                drawVectorLabel(scaled_vec, `k ⋅ AB`, COLORS.text, a.start);
+                drawPoint(c_pos, 'C');
+
+                drawHandle(a.vec, COLORS.vecA, a.start);
+            }
+            if (displayStep === 3) {
+                drawPoint(a.start, 'A');
+                const a_end = { x: a.start.x + a.vec.x, y: a.start.y + a.vec.y };
+                drawPoint(a_end, 'B');
+                drawVector(a.vec, COLORS.vecA, a.start);
+                drawVectorLabel(a.vec, 'AB', COLORS.text, a.start);
+                drawHandle(a.vec, COLORS.vecA, a.start);
+                
+                drawPoint(b.start, 'C');
+                const b_end = { x: b.start.x + b.vec.x, y: b.start.y + b.vec.y };
+                drawPoint(b_end, 'D');
+                drawVector(b.vec, COLORS.vecB, b.start);
+                drawVectorLabel(b.vec, 'CD', COLORS.text, b.start);
+                drawHandle(b.vec, COLORS.vecB, b.start);
+            }
+            if (displayStep === 4) { // Quy tắc 3 điểm
+                const b_start_pos = { x: a.start.x + a.vec.x, y: a.start.y + a.vec.y };
+                const sum_vec = { x: a.vec.x + b.vec.x, y: a.vec.y + b.vec.y };
+                const c_pos = { x: b_start_pos.x + b.vec.x, y: b_start_pos.y + b.vec.y };
+                
+                drawVector(a.vec, COLORS.vecA, a.start);
+                drawVectorLabel(a.vec, 'AB', COLORS.text, a.start);
+                drawVector(b.vec, COLORS.vecB, b_start_pos);
+                drawVectorLabel(b.vec, 'BC', COLORS.text, b_start_pos);
+                drawVector(sum_vec, COLORS.vecSum, a.start);
+                drawVectorLabel(sum_vec, 'AC', COLORS.text, a.start);
+                
+                drawPoint(a.start, 'A');
+                drawPoint(b_start_pos, 'B');
+                drawPoint(c_pos, 'C');
+                drawHandle(a.vec, COLORS.vecA, a.start);
+                drawHandle(b.vec, COLORS.vecB, b_start_pos);
+            }
+            if (displayStep === 5) { // Quy tắc hình bình hành
+                 const b_start_pos = a.start;
+                 const sum_vec = { x: a.vec.x + b.vec.x, y: a.vec.y + b.vec.y };
+                 const a_end_pos = { x: a.start.x + a.vec.x, y: a.start.y + a.vec.y };
+                 const b_end_pos = { x: b_start_pos.x + b.vec.x, y: b_start_pos.y + b.vec.y };
+                 const sum_end_pos = { x: a.start.x + sum_vec.x, y: a.start.y + sum_vec.y };
+
+                 drawVector(a.vec, COLORS.vecA, a.start);
+                 drawVectorLabel(a.vec, 'AB', COLORS.text, a.start);
+                 drawVector(b.vec, COLORS.vecB, b_start_pos);
+                 drawVectorLabel(b.vec, 'AD', COLORS.text, b_start_pos);
+                 drawVector(b.vec, COLORS.vecB, a_end_pos, true);
+                 drawVector(a.vec, COLORS.vecA, b_end_pos, true);
+                 drawVector(sum_vec, COLORS.vecSum, a.start);
+                 drawVectorLabel(sum_vec, 'AC', COLORS.text, a.start);
+
+                 drawPoint(a.start, 'A');
+                 drawPoint(a_end_pos, 'B');
+                 drawPoint(b_end_pos, 'D');
+                 drawPoint(sum_end_pos, 'C');
+                 drawHandle(a.vec, COLORS.vecA, a.start);
+                 drawHandle(b.vec, COLORS.vecB, b_start_pos);
+            }
+        }
+
+        const getMouseMathPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const canvasPos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            return { x: fromCanvasX(canvasPos.x), y: fromCanvasY(canvasPos.y) };
+        };
+
+        const distToSegment = (p, v, w) => {
+            const l2 = (v.x - w.x)**2 + (v.y - w.y)**2;
+            if (l2 === 0) return Math.sqrt((p.x - v.x)**2 + (p.y - v.y)**2);
+            let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+            const proj = { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) };
+            return Math.sqrt((p.x - proj.x)**2 + (p.y - proj.y)**2);
+        };
+        
+        function isNearHandle(mathMouse, vecState, startPos) {
+            const checkStart = startPos || vecState.start;
+            const head = { x: checkStart.x + vecState.vec.x, y: checkStart.y + vecState.vec.y };
+            const dist = Math.sqrt((mathMouse.x - head.x)**2 + (mathMouse.y - head.y)**2);
+            return dist < 12 / scale;
+        }
+        
+        function isNearBody(mathMouse, vecState, startPos) {
+             const checkStart = startPos || vecState.start;
+             const head = { x: checkStart.x + vecState.vec.x, y: checkStart.y + vecState.vec.y };
+             const dist = distToSegment(mathMouse, checkStart, head);
+             return dist < 10 / scale;
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const mouse = getMouseMathPos(e);
+            let b_start_pos = state.b.start;
+            if (displayStep === 4) b_start_pos = { x: state.a.start.x + state.a.vec.x, y: state.a.start.y + state.a.vec.y };
+            if (displayStep === 5) b_start_pos = state.a.start;
+
+            if (displayStep >= 1 && isNearHandle(mouse, state.a)) { state.dragTarget = { type: 'handle', vector: 'a' }; } 
+            else if (displayStep >= 3 && isNearHandle(mouse, state.b, b_start_pos)) { state.dragTarget = { type: 'handle', vector: 'b' }; }
+            else if (displayStep >= 1 && isNearBody(mouse, state.a)) { state.dragTarget = { type: 'body', vector: 'a', offset: { x: mouse.x - state.a.start.x, y: mouse.y - state.a.start.y } }; } 
+            else if (displayStep === 3 && isNearBody(mouse, state.b)) { state.dragTarget = { type: 'body', vector: 'b', offset: { x: mouse.x - state.b.start.x, y: mouse.y - state.b.start.y } }; }
+            
+            if (state.dragTarget) canvas.style.cursor = 'grabbing';
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const mouse = getMouseMathPos(e);
+            if (!state.dragTarget) {
+                let b_start_pos = state.b.start;
+                if (displayStep === 4) b_start_pos = { x: state.a.start.x + state.a.vec.x, y: state.a.start.y + state.a.vec.y };
+                if (displayStep === 5) b_start_pos = state.a.start;
+                
+                if ((displayStep >= 1 && (isNearHandle(mouse, state.a) || isNearBody(mouse, state.a))) ||
+                    (displayStep >= 3 && (isNearHandle(mouse, state.b, b_start_pos) || (displayStep === 3 && isNearBody(mouse, state.b, b_start_pos))))) {
+                    canvas.style.cursor = 'grab';
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+                return;
+            }
+
+            const { type, vector, offset } = state.dragTarget;
+            const targetVecState = state[vector];
+            let startPos = targetVecState.start;
+            if(vector === 'b') {
+                 if (displayStep === 4) startPos = { x: state.a.start.x + state.a.vec.x, y: state.a.start.y + state.a.vec.y };
+                 if (displayStep === 5) startPos = state.a.start;
+            }
+
+            if (type === 'handle') {
+                 targetVecState.vec.x = mouse.x - startPos.x;
+                 targetVecState.vec.y = mouse.y - startPos.y;
+            } else if (type === 'body') {
+                 targetVecState.start.x = mouse.x - offset.x;
+                 targetVecState.start.y = mouse.y - offset.y;
+            }
+            draw();
+        });
+
+        const stopDragging = () => {
+            state.dragTarget = null;
+            canvas.style.cursor = 'default';
+        };
+        canvas.addEventListener('mouseup', stopDragging);
+        canvas.addEventListener('mouseleave', stopDragging);
+
+        stepsControl.addEventListener('change', (e) => {
+            displayStep = parseInt(e.target.value);
+            scalarControl.classList.toggle('hidden', displayStep !== 2);
+            draw();
+        });
+        
+        scalarSlider.addEventListener('input', (e) => {
+            state.k = parseFloat(e.target.value);
+            kValueDisplay.textContent = state.k.toFixed(1);
+            draw();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            state = getInitialState();
+            displayStep = 1;
+            document.getElementById('step1').checked = true;
+            scalarSlider.value = state.k;
+            kValueDisplay.textContent = state.k.toFixed(1);
+            scalarControl.classList.add('hidden');
+            draw();
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            try {
+                if (!document.fullscreenElement) {
+                    const requestPromise = canvasContainer.requestFullscreen();
+                    if (requestPromise) { requestPromise.catch(err => console.log(`Toàn màn hình thất bại: ${err.message}`)); }
+                } else { document.exitFullscreen(); }
+            } catch (err) { console.error("Lỗi toàn màn hình:", err); }
+        });
+
+        document.addEventListener('fullscreenchange', () => { setTimeout(setupCanvas, 50); });
+        window.addEventListener('resize', setupCanvas);
+        document.addEventListener('DOMContentLoaded', () => {
+             scalarSlider.value = state.k;
+             kValueDisplay.textContent = state.k.toFixed(1);
+             setupCanvas();
+        });
+    </script>
+</body>
+</html>
+
