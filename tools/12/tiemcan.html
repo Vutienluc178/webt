@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khảo Sát Tiệm Cận Của Đồ Thị Hàm Số</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        .control-panel {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        canvas {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        .input-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .input-fraction > .numerator {
+            border-bottom: 2px solid #1f2937;
+            padding: 0.5rem 1rem;
+        }
+        .input-fraction > .denominator {
+            padding: 0.5rem 1rem;
+        }
+        .input-fraction input {
+            width: 3.5rem;
+            text-align: center;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            font-size: 1.125rem;
+            margin: 0 0.25rem;
+        }
+        .explanation-box {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .explanation-box h4 {
+            font-weight: bold;
+            color: #4338ca;
+            margin-bottom: 0.5rem;
+        }
+        .reset-btn {
+            background-color: #3b82f6;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .reset-btn:hover {
+            background-color: #2563eb;
+        }
+        .func-type-label {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        input[type="radio"]:checked + .func-type-label {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+         input[type="radio"] {
+            display: none;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <header class="text-center mb-6">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800">Khảo Sát Tiệm Cận Của Đồ Thị Hàm Số</h1>
+        <p class="text-lg text-gray-500 mt-2">Vũ Tiến Lực - Trường THPT Nguyễn Hữu Cảnh</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cột Trái: Canvas -->
+        <div id="canvas-container" class="lg:col-span-2 relative w-full h-full min-h-[400px] md:min-h-[600px]">
+            <canvas id="graphCanvas"></canvas>
+            <button id="fullscreen-btn" class="absolute top-3 right-3 p-2 rounded-full bg-gray-200/80 hover:bg-gray-300/80 transition-colors z-10" title="Chế độ toàn màn hình">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-700">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Cột Phải: Bảng điều khiển -->
+        <div class="control-panel flex flex-col justify-between">
+            <div>
+                 <h3 class="text-xl font-bold mb-4 text-center">Chọn Dạng Hàm</h3>
+                 <div id="func-type-selector" class="flex justify-center gap-4 mb-6">
+                     <div>
+                         <input type="radio" name="func-type" id="type-l1l1" value="l1l1" checked>
+                         <label for="type-l1l1" class="func-type-label">Bậc 1 / Bậc 1</label>
+                     </div>
+                     <div>
+                         <input type="radio" name="func-type" id="type-q1l1" value="q1l1">
+                         <label for="type-q1l1" class="func-type-label">Bậc 2 / Bậc 1</label>
+                     </div>
+                 </div>
+
+                <div id="func-input-l1l1" class="flex items-center justify-center text-2xl font-semibold">
+                    <span>y =</span>
+                    <div class="input-fraction">
+                        <div class="numerator">
+                            <input type="number" id="l1l1-a" value="2"> x + <input type="number" id="l1l1-b" value="-1">
+                        </div>
+                        <div class="denominator">
+                            <input type="number" id="l1l1-c" value="1"> x + <input type="number" id="l1l1-d" value="1">
+                        </div>
+                    </div>
+                </div>
+                 <div id="func-input-q1l1" class="hidden flex items-center justify-center text-2xl font-semibold">
+                    <span>y =</span>
+                    <div class="input-fraction">
+                        <div class="numerator">
+                            <input type="number" id="q1l1-a" value="1">x² + <input type="number" id="q1l1-b" value="-3">x + <input type="number" id="q1l1-c" value="1">
+                        </div>
+                        <div class="denominator">
+                            <input type="number" id="q1l1-d" value="1">x + <input type="number" id="q1l1-e" value="-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="explanation-container" class="space-y-4">
+                 <h3 class="text-xl font-bold text-center">Phương Pháp Xác Định</h3>
+                 <div id="vertical-exp" class="explanation-box"></div>
+                 <div id="horizontal-exp" class="explanation-box"></div>
+            </div>
+
+            <div class="pt-4">
+                 <button id="reset-btn" class="w-full reset-btn">Thiết Lập Lại</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let state = {
+            currentFuncType: 'l1l1',
+            coeffs: {
+                l1l1: { a: 2, b: -1, c: 1, d: 1 },
+                q1l1: { a: 1, b: -3, c: 1, d: 1, e: -2 }
+            },
+            origin: { x: 0, y: 0 },
+            scale: 40,
+            isDragging: false,
+            dragStart: { x: 0, y: 0 }
+        };
+
+        const toCanvasX = (x) => state.origin.x + x * state.scale;
+        const toCanvasY = (y) => state.origin.y - y * state.scale;
+        const fromCanvasX = (cx) => (cx - state.origin.x) / state.scale;
+        const fromCanvasY = (cy) => (state.origin.y - cy) / state.scale;
+
+        function setupCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            state.origin.x = canvas.clientWidth / 2;
+            state.origin.y = canvas.clientHeight / 2;
+            draw();
+        }
+
+        function drawGridAndAxes() {
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            ctx.strokeStyle = "#e5e7eb";
+            ctx.lineWidth = 1;
+            for (let x = state.origin.x % state.scale; x < width; x += state.scale) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
+            }
+            for (let y = state.origin.y % state.scale; y < height; y += state.scale) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            }
+            ctx.strokeStyle = "#6b7280";
+            ctx.fillStyle = "#6b7280";
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(0, state.origin.y); ctx.lineTo(width, state.origin.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(state.origin.x, 0); ctx.lineTo(state.origin.x, height); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(width - 15, state.origin.y - 8); ctx.lineTo(width, state.origin.y); ctx.lineTo(width - 15, state.origin.y + 8); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(state.origin.x - 8, 15); ctx.lineTo(state.origin.x, 0); ctx.lineTo(state.origin.x + 8, 15); ctx.stroke();
+            ctx.font = "bold 24px 'Inter'";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("O", state.origin.x - 20, state.origin.y + 20);
+            ctx.fillText("x", width - 20, state.origin.y + 25);
+            ctx.fillText("y", state.origin.x - 25, 20);
+        }
+
+        function getFunctionData() {
+             const data = {
+                func: x => NaN,
+                vertical: null, horizontal: null, slant: null,
+                verticalExp: "<h4>Lỗi</h4><p>Hàm số không xác định.</p>",
+                horizontalExp: ""
+            };
+
+            if (state.currentFuncType === 'l1l1') {
+                const { a, b, c, d } = state.coeffs.l1l1;
+                data.func = x => (a * x + b) / (c * x + d);
+                if (c === 0 && d === 0) {
+                     data.verticalExp = "<h4>Lỗi</h4><p>Mẫu số không thể bằng 0 (c=0 và d=0).</p>";
+                     return data;
+                }
+                if (c !== 0) {
+                    const root = -d / c;
+                    if (a * root + b !== 0) {
+                        data.vertical = { x: root };
+                        data.verticalExp = `<h4>Tiệm cận đứng</h4><p>Nghiệm mẫu số là x = ${root.toFixed(2)}.</p><p>⇒ TCĐ là <b>x = ${root.toFixed(2)}</b>.</p>`;
+                    } else {
+                         data.verticalExp = "<h4>Tiệm cận đứng</h4><p>Không có (nghiệm mẫu cũng là nghiệm tử).</p>";
+                    }
+                     const asymptoteY = a / c;
+                     data.horizontal = { y: asymptoteY };
+                     data.horizontalExp = `<h4>Tiệm cận ngang</h4><p>Bậc tử = Bậc mẫu.</p><p>⇒ TCN là <b>y = ${asymptoteY.toFixed(2)}</b>.</p>`;
+                } else {
+                     data.verticalExp = "<h4>Tiệm cận đứng</h4><p>Không có (mẫu là hằng số).</p>";
+                     data.horizontalExp = "<h4>Tiệm cận ngang</h4><p>Không có (hàm bậc 1).</p>";
+                }
+            } else if (state.currentFuncType === 'q1l1') {
+                const { a, b, c, d, e } = state.coeffs.q1l1;
+                data.func = x => (a*x*x + b*x + c) / (d*x + e);
+                 if (d === 0 && e === 0) {
+                     data.verticalExp = "<h4>Lỗi</h4><p>Mẫu số không thể bằng 0 (d=0 và e=0).</p>";
+                     return data;
+                }
+                data.horizontalExp = "<h4>Tiệm cận ngang</h4><p>Không có (bậc tử > bậc mẫu).</p>";
+                if (d !== 0) {
+                    const root = -e / d;
+                    const numAtRoot = a*root*root + b*root + c;
+                     if (Math.abs(numAtRoot) > 1e-9) { // Check if numerator is non-zero
+                        data.vertical = { x: root };
+                        data.verticalExp = `<h4>Tiệm cận đứng</h4><p>Nghiệm mẫu số là x = ${root.toFixed(2)}.</p><p>⇒ TCĐ là <b>x = ${root.toFixed(2)}</b>.</p>`;
+                    } else {
+                        data.verticalExp = "<h4>Tiệm cận đứng</h4><p>Không có (nghiệm mẫu cũng là nghiệm tử).</p>";
+                    }
+                    // Slant asymptote
+                    const m = a / d;
+                    const k = (b*d - a*e) / (d*d);
+                    data.slant = { func: x => m*x + k };
+                    data.horizontalExp += `<br><h4>Tiệm cận xiên</h4><p>Chia đa thức ta được y ≈ ${m.toFixed(2)}x ${k >= 0 ? '+ ' : ''}${k.toFixed(2)}.</p><p>⇒ TCX là <b>y = ${m.toFixed(2)}x ${k >= 0 ? '+ ' : ''}${k.toFixed(2)}</b>.</p>`;
+                } else {
+                    data.verticalExp = "<h4>Tiệm cận đứng</h4><p>Không có (mẫu là hằng số).</p>";
+                    data.horizontalExp = "<h4>Tiệm cận ngang/xiên</h4><p>Không có (hàm bậc 2).</p>";
+                }
+            }
+            return data;
+        }
+
+        function drawFunction(data) {
+            ctx.strokeStyle = "#f59e0b";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            let firstPoint = true;
+            for (let i = 0; i < canvas.clientWidth; i++) {
+                const x = fromCanvasX(i);
+                const y = data.func(x);
+                if (isFinite(y)) {
+                    const canvasY = toCanvasY(y);
+                    const prevY = data.func(fromCanvasX(i - 1));
+                    if (Math.abs(y - prevY) > 500 / state.scale) {
+                        ctx.stroke(); ctx.beginPath();
+                    }
+                    if (firstPoint) {
+                        ctx.moveTo(i, canvasY); firstPoint = false;
+                    } else { ctx.lineTo(i, canvasY); }
+                } else {
+                    ctx.stroke(); firstPoint = true;
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawIntersectionPoint(x, y, color) {
+            if (x === 0 && y === 0) return;
+            const cx = toCanvasX(x);
+            const cy = toCanvasY(y);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.font = "bold 18px 'Inter'";
+            if (x === 0) {
+                ctx.textAlign = "left"; ctx.textBaseline = "middle";
+                ctx.fillText(y.toFixed(1), cx + 12, cy);
+            } else {
+                ctx.textAlign = "center"; ctx.textBaseline = "top";
+                ctx.fillText(x.toFixed(1), cx, cy + 12);
+            }
+        }
+
+        function drawAsymptotes(data) {
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 10]);
+            if (data.vertical) {
+                const color = "#ef4444";
+                ctx.strokeStyle = color;
+                const x = toCanvasX(data.vertical.x);
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.clientHeight); ctx.stroke();
+                drawIntersectionPoint(data.vertical.x, 0, color);
+            }
+            if (data.horizontal) {
+                const color = "#3b82f6";
+                ctx.strokeStyle = color;
+                const y = toCanvasY(data.horizontal.y);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.clientWidth, y); ctx.stroke();
+                drawIntersectionPoint(0, data.horizontal.y, color);
+            }
+            if (data.slant) {
+                const color = "#22c55e";
+                ctx.strokeStyle = color;
+                const x1 = fromCanvasX(0);
+                const x2 = fromCanvasX(canvas.clientWidth);
+                const y1 = toCanvasY(data.slant.func(x1));
+                const y2 = toCanvasY(data.slant.func(x2));
+                ctx.beginPath(); ctx.moveTo(0, y1); ctx.lineTo(canvas.clientWidth, y2); ctx.stroke();
+                const oy_intercept = data.slant.func(0);
+                const ox_intercept = -oy_intercept / (data.slant.func(1) - oy_intercept);
+                if(isFinite(oy_intercept)) drawIntersectionPoint(0, oy_intercept, color);
+                if(isFinite(ox_intercept)) drawIntersectionPoint(ox_intercept, 0, color);
+            }
+            ctx.setLineDash([]);
+        }
+
+        function draw() {
+            const data = getFunctionData();
+            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+            drawGridAndAxes();
+            drawAsymptotes(data);
+            drawFunction(data);
+        }
+        
+        function updateExplanations() {
+            const data = getFunctionData();
+            document.getElementById('vertical-exp').innerHTML = data.verticalExp;
+            document.getElementById('horizontal-exp').innerHTML = data.horizontalExp;
+        }
+
+        function handleInputChange() {
+            if (state.currentFuncType === 'l1l1') {
+                state.coeffs.l1l1.a = parseFloat(document.getElementById('l1l1-a').value) || 0;
+                state.coeffs.l1l1.b = parseFloat(document.getElementById('l1l1-b').value) || 0;
+                state.coeffs.l1l1.c = parseFloat(document.getElementById('l1l1-c').value) || 0;
+                state.coeffs.l1l1.d = parseFloat(document.getElementById('l1l1-d').value) || 0;
+            } else {
+                 state.coeffs.q1l1.a = parseFloat(document.getElementById('q1l1-a').value) || 0;
+                 state.coeffs.q1l1.b = parseFloat(document.getElementById('q1l1-b').value) || 0;
+                 state.coeffs.q1l1.c = parseFloat(document.getElementById('q1l1-c').value) || 0;
+                 state.coeffs.q1l1.d = parseFloat(document.getElementById('q1l1-d').value) || 0;
+                 state.coeffs.q1l1.e = parseFloat(document.getElementById('q1l1-e').value) || 0;
+            }
+            draw();
+            updateExplanations();
+        }
+
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('input', handleInputChange);
+        });
+
+        document.getElementById('func-type-selector').addEventListener('change', e => {
+            state.currentFuncType = e.target.value;
+            const isL1L1 = state.currentFuncType === 'l1l1';
+            document.getElementById('func-input-l1l1').classList.toggle('hidden', !isL1L1);
+            document.getElementById('func-input-q1l1').classList.toggle('hidden', isL1L1);
+            handleInputChange(); // Recalculate with current values
+        });
+
+        canvas.addEventListener('mousedown', e => {
+            state.isDragging = true;
+            state.dragStart = { x: e.clientX, y: e.clientY };
+            canvas.style.cursor = 'grabbing';
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (state.isDragging) {
+                const dx = e.clientX - state.dragStart.x;
+                const dy = e.clientY - state.dragStart.y;
+                state.origin.x += dx;
+                state.origin.y += dy;
+                state.dragStart = { x: e.clientX, y: e.clientY };
+                draw();
+            }
+        });
+
+        const stopDragging = () => {
+             if (state.isDragging) {
+                state.isDragging = false;
+                canvas.style.cursor = 'grab';
+            }
+        }
+        canvas.addEventListener('mouseup', stopDragging);
+        canvas.addEventListener('mouseleave', stopDragging);
+        
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const mouseX = fromCanvasX(e.offsetX);
+            const mouseY = fromCanvasY(e.offsetY);
+            const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+            state.scale *= zoomFactor;
+            state.origin.x = e.offsetX - mouseX * state.scale;
+            state.origin.y = e.offsetY + mouseY * state.scale;
+            draw();
+        });
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            state.scale = 40;
+            setupCanvas();
+        });
+
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const canvasContainer = document.getElementById('canvas-container');
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                canvasContainer.requestFullscreen().catch(err => console.log(err.message));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+        document.addEventListener('fullscreenchange', () => setTimeout(setupCanvas, 50));
+
+        window.addEventListener('resize', setupCanvas);
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCanvas();
+            updateExplanations();
+        });
+    </script>
+</body>
+</html>
+
